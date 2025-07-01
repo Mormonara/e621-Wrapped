@@ -1,0 +1,1 @@
+This is a project in development meant to allow the generation of statistics for e621 users based on public favorites data
