@@ -341,8 +341,11 @@ if __name__ == "__main__":
     fav_post = e621.get_post_thumb(post_by_scores[0], 400)
     wrapped.paste(fav_post, (582, 608))
 
-    user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
-    wrapped.paste(user_pfp, (30, 13))
+    try:
+        user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
+        wrapped.paste(user_pfp, (30, 13))
+    except:
+        pass
 
     template = Image.open("template.png")
     wrapped.paste(template, (0, 0), template)
@@ -425,7 +428,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig(f"{user_name}_detailed.png")
 
-    print(f"- Saved your detailed report as detailed_result_{user_name}.png :3")
+    print(f"- Saved your detailed report as {user_name}_detailed.png :3")
     print(f"\n- So you're into {favorite_tags[0].split(':')[1].replace('_', ' ')}, huh... ;3\n")
 
         

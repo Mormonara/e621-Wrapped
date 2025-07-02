@@ -14,19 +14,26 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# STEP 2: Create virtual environment
-echo "- Creating virtual environment... please wait a sec :3c"
-python3 -m venv .venv
+# STEP 2: Create virtual environment if it doesn't exist
+if [ -d .venv ]; then
+    echo "- Virtual environment already exists! Skipping creation and pip install."
+else
+    echo "- Creating virtual environment... please wait a sec :3c"
+    python3 -m venv .venv
+fi
 
 # STEP 3: Activate virtual environment
 source .venv/bin/activate
 
-# STEP 4: Install requirements
+# STEP 4: Install requirements only if not already installed
 if [ -f requirements.txt ]; then
-    echo "- Installing requirements... >:3"
-    echo
-    python -m pip install --upgrade pip
-    python -m pip install -r requirements.txt
+    if [ ! -f .venv/installed.flag ]; then
+        echo "- Installing requirements... >:3"
+        echo
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+        echo "done" > .venv/installed.flag
+    fi
 else
     echo "[WARNING] requirements.txt not found. Skipping dependency installation."
 fi
