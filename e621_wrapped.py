@@ -11,7 +11,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 CREDENTIALS_FILE = "credentials.json"
 INTERESTS_FILE = "interests.json"
-RESULT_FILE = "Wrapped.png"
 TAG_IMPLICATIONS_FILE = "data/tag_implications.csv"
 
 MIN_PERCENT = 0.001
@@ -102,6 +101,30 @@ def draw_favorite(tag_name, user_profile, bb, img, first):
     )
 
 
+def get_post_score(post, user_profile, weights, favorite_tag_categories, return_best_tags=False):
+    score = 0
+
+    post["clean_tags"] = []
+    for topic in post["tags"]:
+        for tag in post["tags"][topic]:
+            post["clean_tags"].append(f"{topic}:{tag}")
+
+    best_tags = []
+    for i, favorites in enumerate(favorite_tag_categories):
+        added_best_tag = False
+        for tag in favorites:
+            if tag in post["clean_tags"]:
+                if not added_best_tag:
+                    added_best_tag = True
+                    best_tags.append(tag.split(":")[1])
+                score += weights[i] * user_profile[tag]["enjoyment"]
+
+    final_score = score / math.pow(len(post["clean_tags"]), 0.2) * (math.pow(post["score"]["total"], 0.1) if post["score"]["total"] > 0 else 0)
+    if return_best_tags:
+        return final_score, best_tags
+    return final_score
+
+
 if __name__ == "__main__":
     ##################
     # Initialization #
@@ -127,10 +150,12 @@ if __name__ == "__main__":
     ########################
     # Get favorites
     favs = []
+    fav_dict = {}
     for i in tqdm(range(int(args.pages)), "Getting favorites", unit=" pages", total=int(args.pages)):
         new_favs = e621.get_favorites(args.user, i)
         for fav in new_favs:
             favs.append(fav)
+            fav_dict[fav["id"]] = True
         if len(new_favs) < 320:
             break
     
@@ -304,32 +329,33 @@ if __name__ == "__main__":
         least_favorite_tags.append(tag)
 
     # Favorite post
+    favorite_tag_categories = [favorite_tags, favorite_species, favorite_characters, favorite_artists]
+    weights = [1.0, 1.0, 1.0, 1.0]
+    for idx, favorites in enumerate(favorite_tag_categories):
+        weights[idx] *= 1.0 / user_profile[favorites[0]]["enjoyment"]
+
     post_scores = {}
+    
     for fav in favs:
         if fav["file"]["url"] is None:
             continue
         if not fav["file"]["url"].split(".")[-1] in ALLOWED_FILE_TYPES:
             continue
-
-        score = 0
-        favorite_tag_categories = [favorite_tags, favorite_species, favorite_characters, favorite_artists]
-        weights = [1.0, 1.0, 1.0, 1.0]
-        for idx, favorites in enumerate(favorite_tag_categories):
-            weights[idx] *= 1.0 / user_profile[favorites[0]]["enjoyment"]
-
-        fav["clean_tags"] = []
-        for topic in fav["tags"]:
-            for tag in fav["tags"][topic]:
-                fav["clean_tags"].append(f"{topic}:{tag}")
-
-        for i, favorites in enumerate(favorite_tag_categories):
-            for tag in favorites:
-                if tag in fav["clean_tags"]:
-                    score += weights[i] * user_profile[tag]["enjoyment"]
-
-        post_scores[fav["id"]] = score / math.pow(len(fav["clean_tags"]), 0.1) * (math.pow(fav["score"]["total"], 0.1) if fav["score"]["total"] > 0 else 0)
+            
+        post_scores[fav["id"]] = get_post_score(fav, user_profile, weights, favorite_tag_categories)
     
     post_by_scores = sorted(post_scores.keys(), key=lambda post: post_scores[post], reverse=True)
+
+    saved_profile = {
+        "profile": user_profile,
+        "weights": weights, 
+        "favorites": favorite_tag_categories,
+        "fav_dict": fav_dict
+    }
+
+    with open(f"{user_name}_profile.json", "w") as f:
+        json.dump(saved_profile, f, indent=4)
+    print(f"- Saved your profile as {user_name}_profile.json :3\n")
 
     ######################
     # Generating Wrapped #
@@ -431,7 +457,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig(f"{user_name}_detailed.png")
 
-    print(f"- Saved your detailed report as {user_name}_detailed.png :3")
+    print(f"\n- Saved your detailed report as {user_name}_detailed.png :3")
     print(f"\n- So you're into {favorite_tags[0].split(':')[1].replace('_', ' ')}, huh... ;3\n")
 
         

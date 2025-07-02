@@ -52,6 +52,27 @@ class e621Client():
         
         data = response.json()
         return data['posts']
+
+
+    def get_random_posts(self, min_upvotes, extra_tags):
+        url = f"https://e621.net/posts.json?tags=order:random+score:>={min_upvotes}{'+' + extra_tags if len(extra_tags) > 0 else ''}"
+        try:
+            self.wait_delay()
+            response = requests.get(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers
+                )
+        except:
+            print(f"Failed to get posts - An unexpected error occurred")
+            return []
+        
+        if response.status_code != 200:
+            print(f"Failed to get posts - Status: {response.status_code}")
+            return []
+        
+        data = response.json()
+        return data['posts']
     
 
     def get_top_users(self, page_num):
