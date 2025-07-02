@@ -273,7 +273,7 @@ if __name__ == "__main__":
 
         if not category == "artist":
             continue
-        if name in ["sound_warning"]:
+        if name in ["sound_warning", "conditional_dnp"]:
             continue
         
         favorite_artists.append(tag)
@@ -338,11 +338,17 @@ if __name__ == "__main__":
 
     wrapped = Image.new("RGBA", (1080, 1080))
 
-    fav_post = e621.get_post_thumb(post_by_scores[0], 400)
-    wrapped.paste(fav_post, (582, 608))
+    try:
+        fav_post = e621.get_post_thumb(post_by_scores[0], 400)
+        wrapped.paste(fav_post, (582, 608))
+    except:
+        pass
 
-    user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
-    wrapped.paste(user_pfp, (30, 13))
+    try:
+        user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
+        wrapped.paste(user_pfp, (30, 13))
+    except:
+        pass
 
     template = Image.open("template.png")
     wrapped.paste(template, (0, 0), template)
@@ -425,7 +431,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig(f"{user_name}_detailed.png")
 
-    print(f"- Saved your detailed report as detailed_result_{user_name}.png :3")
+    print(f"- Saved your detailed report as {user_name}_detailed.png :3")
     print(f"\n- So you're into {favorite_tags[0].split(':')[1].replace('_', ' ')}, huh... ;3\n")
 
         
