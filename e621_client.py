@@ -3,16 +3,25 @@ import json
 import time
 from PIL import Image
 from io import BytesIO
+import os
 
 
 class e621Client():
     def __init__(self, credentials_path, delay = 1):
-        with open(credentials_path, 'r') as f:
-            credentials = json.load(f)
-            self.auth = (credentials["username"], credentials["api_key"])
+        if os.path.exists("credentials.json"):
+            with open(credentials_path, 'r') as f:
+                credentials = json.load(f)
+                self.auth = (credentials["username"], credentials["api_key"])
+                self.headers = {
+                    "User-Agent": credentials["user_agent"]
+                }
+        else:
+            print("- Running in unauthenticated mode :o to access private favorite data, please provide a credentials.json as specified in the README")
+            self.auth = None
             self.headers = {
-                "User-Agent": credentials["user_agent"]
+                    "User-Agent": "e621Wrapped/1.0 (by mormonara on e621)"
             }
+        
         self.delay = delay
         self.time_since_last_request = 0.0
     

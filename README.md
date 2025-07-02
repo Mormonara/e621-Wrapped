@@ -4,7 +4,19 @@ This is a Python application for generating overviews of a user's favorite tags 
 
 ## ⚙ Quickstart
 
-To run this application, you will need to have Python 3.10 installed. After cloning this repository, you must create a file called `credentials.json` that stores your #621 user name and API key. This is required to access the API. The file should have the following content:
+### Requirements
+
+To run this application, you will need to have Python 3.10 installed. It can be downloaded from https://www.python.org/downloads/
+
+### Running
+
+You can download this repository by clicking **Download ZIP** on the **Code** dropdown (green button on the top right). Unzip it wherever you want
+
+To generate your E621 Wrapped, simply double click `generate.bat` on **Windows** or run `generate.sh` on **Linux**. This will generate a terminal window that will install the required libraries and ask you for your USER_ID (the numbers that appear at the end of your profile's url). Finally, it will generate the files `username.png`, which contains your E621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category
+
+### Authentication
+
+If you'd like to access your own private favorite information, you can optionally create a `credentials.json` file in the main directory that contains the following:
 
 ```json
 {
@@ -13,20 +25,6 @@ To run this application, you will need to have Python 3.10 installed. After clon
     "user_agent": "e621Wrapped/1.0 (by mormonara on e621)"
 }
 ```
-
-Then, to install the required libraries, run the following command
-
-```bash
-pip install -r requirements.txt
-```
-
-Finally, to run the application and generate your E621 Wrapped, run the following command
-
-```bash
-python e621_wrapped.py -u <YOUR_USER_ID>
-```
-
-This will generate the files `username.png`, which contains your E621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category.
 
 ## ❓ How it works
 
