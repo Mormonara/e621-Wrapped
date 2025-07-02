@@ -273,7 +273,7 @@ if __name__ == "__main__":
 
         if not category == "artist":
             continue
-        if name in ["sound_warning"]:
+        if name in ["sound_warning", "conditional_dnp"]:
             continue
         
         favorite_artists.append(tag)
