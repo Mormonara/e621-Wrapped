@@ -4,8 +4,6 @@ This is a Python application for generating overviews of a user's favorite tags 
 
 ## ⚙ Quickstart
 
-To run this application, you will need to have Python 3.10 installed. After cloning this repository, you must create a file called `credentials.json` that stores your e621 user name and API key. This is required to access the API. The file should have the following content:
-
 ### Requirements
 
 To run this application, you will need to have Python 3.10 installed. It can be downloaded from https://www.python.org/downloads/
