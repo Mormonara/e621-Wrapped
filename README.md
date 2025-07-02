@@ -1,8 +1,10 @@
-# 🦊 E621 Wrapped
+# 🦊 e621 Wrapped
 
-This is a Python application for generating overviews of a user's favorite tags in E621 based on public favorite data.
+This is a Python application for generating overviews of a user's favorite tags in e621 based on public favorite data.
 
 ## ⚙ Quickstart
+
+To run this application, you will need to have Python 3.10 installed. After cloning this repository, you must create a file called `credentials.json` that stores your e621 user name and API key. This is required to access the API. The file should have the following content:
 
 ### Requirements
 
@@ -12,7 +14,7 @@ To run this application, you will need to have Python 3.10 installed. It can be 
 
 You can download this repository by clicking **Download ZIP** on the **Code** dropdown (green button on the top right). Unzip it wherever you want
 
-To generate your E621 Wrapped, simply double click `generate.bat` on **Windows** or run `generate.sh` on **Linux**. This will generate a terminal window that will install the required libraries and ask you for your USER_ID (the numbers that appear at the end of your profile's url). Finally, it will generate the files `username.png`, which contains your E621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category
+To generate your e621 Wrapped, simply double click `generate.bat` on **Windows** or run `generate.sh` on **Linux**. This will generate a terminal window that will install the required libraries and ask you for your USER_ID (the numbers that appear at the end of your profile's url). Finally, it will generate the files `username.png`, which contains your e621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category
 
 ### Authentication
 
@@ -28,11 +30,11 @@ If you'd like to access your own private favorite information, you can optionall
 
 ## ❓ How it works
 
-E621 Wrapped uses public favorite information to create a user profile and compares it to the average user
+e621 Wrapped uses public favorite information to create a user profile and compares it to the average user
 
 ### Creating an average user profile
 
-The file `interests.json` stores information about the **presence** of each tag in the average user's favorites. That is, what percentage of posts in their favorites contain this tag. This file was generated from the public favorites of a couple thousand users, starting from E621's top users. You can run `interest_generator.py` with a custom amount of pages using the option `-p total_pages` to regenerate the average user profile, but keep in mind that this will take at least 6 minutes per page due to E621's API's limits.
+The file `interests.json` stores information about the **presence** of each tag in the average user's favorites. That is, what percentage of posts in their favorites contain this tag. This file was generated from the public favorites of a couple thousand users, starting from e621's top users. You can run `interest_generator.py` with a custom amount of pages using the option `-p total_pages` to regenerate the average user profile, but keep in mind that this will take at least 6 minutes per page due to e621's API's limits.
 
 ### Computing a user's profile
 
