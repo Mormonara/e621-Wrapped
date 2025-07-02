@@ -338,8 +338,11 @@ if __name__ == "__main__":
 
     wrapped = Image.new("RGBA", (1080, 1080))
 
-    fav_post = e621.get_post_thumb(post_by_scores[0], 400)
-    wrapped.paste(fav_post, (582, 608))
+    try:
+        fav_post = e621.get_post_thumb(post_by_scores[0], 400)
+        wrapped.paste(fav_post, (582, 608))
+    except:
+        pass
 
     try:
         user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
