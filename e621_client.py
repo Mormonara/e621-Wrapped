@@ -1,6 +1,8 @@
 import requests
 import json
 import time
+from PIL import Image
+from io import BytesIO
 
 
 class e621Client():
@@ -61,3 +63,66 @@ class e621Client():
             return []
         
         return response.json()
+    
+
+    def get_user(self, user_id):
+        url = f"https://e621.net/users/{user_id}.json"
+        try:
+            self.wait_delay()
+            response = requests.get(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers
+                )
+        except:
+            print(f"Failed to get post - An unexpected error occurred")
+            return[]
+        
+        if response.status_code != 200:
+            print(f"Failed to get post - Status: {response.status_code}")
+            return []
+        
+        return response.json()
+
+
+    def get_post_thumb(self, post_id, side):
+        url = f"https://e621.net/posts/{post_id}.json"
+        try:
+            self.wait_delay()
+            response = requests.get(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers
+                )
+        except:
+            print(f"Failed to get post - An unexpected error occurred")
+            return[]
+        
+        if response.status_code != 200:
+            print(f"Failed to get post - Status: {response.status_code}")
+            return []
+        
+        data = response.json()
+        url = data["post"]["file"]["url"]
+        try:
+            self.wait_delay()
+            response = requests.get(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers
+                )
+        except:
+            print(f"Failed to get post - An unexpected error occurred")
+            return[]
+        
+        if response.status_code != 200:
+            print(f"Failed to get post - Status: {response.status_code}")
+            return []
+
+        img = Image.open(BytesIO(response.content))
+        l = int(min(img.size[0], img.size[1]) / 2)
+        xc = int(img.size[0] / 2)
+        yc = int(img.size[1] / 2)
+        img = img.crop((xc - l, yc - l, xc + l, yc + l))
+        img = img.resize((side, side))
+        return img
