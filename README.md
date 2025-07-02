@@ -1,10 +1,10 @@
-# 🦊 E621 Wrapped
+# 🦊 e621 Wrapped
 
-This is a Python application for generating overviews of a user's favorite tags in E621 based on public favorite data.
+This is a Python application for generating overviews of a user's favorite tags in e621 based on public favorite data.
 
 ## ⚙ Quickstart
 
-To run this application, you will need to have Python 3.10 installed. After cloning this repository, you must create a file called `credentials.json` that stores your #621 user name and API key. This is required to access the API. The file should have the following content:
+To run this application, you will need to have Python 3.10 installed. After cloning this repository, you must create a file called `credentials.json` that stores your e621 user name and API key. This is required to access the API. The file should have the following content:
 
 ```json
 {
@@ -20,21 +20,21 @@ Then, to install the required libraries, run the following command
 pip install -r requirements.txt
 ```
 
-Finally, to run the application and generate your E621 Wrapped, run the following command
+Finally, to run the application and generate your e621 Wrapped, run the following command
 
 ```bash
 python e621_wrapped.py -u <YOUR_USER_ID>
 ```
 
-This will generate the files `username.png`, which contains your E621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category.
+This will generate the files `username.png`, which contains your e621 Wrapped, and `username_detailed.png`, which contains a more thorough report, with information on the top 25 contenders for each category.
 
 ## ❓ How it works
 
-E621 Wrapped uses public favorite information to create a user profile and compares it to the average user
+e621 Wrapped uses public favorite information to create a user profile and compares it to the average user
 
 ### Creating an average user profile
 
-The file `interests.json` stores information about the **presence** of each tag in the average user's favorites. That is, what percentage of posts in their favorites contain this tag. This file was generated from the public favorites of a couple thousand users, starting from E621's top users. You can run `interest_generator.py` with a custom amount of pages using the option `-p total_pages` to regenerate the average user profile, but keep in mind that this will take at least 6 minutes per page due to E621's API's limits.
+The file `interests.json` stores information about the **presence** of each tag in the average user's favorites. That is, what percentage of posts in their favorites contain this tag. This file was generated from the public favorites of a couple thousand users, starting from e621's top users. You can run `interest_generator.py` with a custom amount of pages using the option `-p total_pages` to regenerate the average user profile, but keep in mind that this will take at least 6 minutes per page due to e621's API's limits.
 
 ### Computing a user's profile
 
