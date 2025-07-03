@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--score", default=6, help="Minimum score to recommend a post")
     parser.add_argument("-m", "--min_upvotes", default=100, help="Minimum upvote score of searched posts")
     parser.add_argument("-t", "--extra_tags", default="", help="Extra tags to be used on searched posts", nargs="*")
+    parser.add_argument("-a", "--add_to_set", default="n", help="Adds posts gathered to a new set (y/n)")
     args = parser.parse_args()
     
     e621 = e621Client(CREDENTIALS_FILE)
@@ -34,18 +35,32 @@ if __name__ == "__main__":
         exit(0)
     with open(f"{user_name}_profile.json") as f:
         profile = json.load(f)
+
+    if args.add_to_set == "y":
+        if not "set" in profile:
+            new_id = e621.create_set(f"{user_name} Wrapped Recommendations", f"{user_name}_wrapped_recommendations")
+            if new_id == -1:
+                exit(0)
+
+            profile["set"] = {
+                "id": new_id,
+                "posts": {}
+            }
     
 
     ###################
     # Recommend posts #
     ###################
     recommended_posts = profile["fav_dict"]
+    if args.add_to_set == "y":
+        recommended_posts.update(profile["set"]["posts"])
     max_score = 0
 
     for i in range(int(args.pages)):
         print(f"\n- Looking for posts in page {i + 1}... :3c\n")
 
         posts = e621.get_random_posts(int(args.min_upvotes), "+".join(args.extra_tags))
+        recommended_ids = []
         for post in posts:
             if str(post["id"]) in recommended_posts:
                 continue
@@ -53,10 +68,18 @@ if __name__ == "__main__":
             score, best_tags = get_post_score(post, profile["profile"], profile["weights"], profile["favorites"], True)
             if score >= int(args.score):
                 recommended_posts[str(post["id"])] = True
+                recommended_ids.append(post["id"])
+
                 print(f"{str(int(score)) + ('*' if score > max_score and max_score != 0 else ''):3s}| https://e621.net/posts/{str(post['id']):10s} | {' '.join(best_tags)}")
                 if score > max_score:
                     max_score = score
+        
+        if args.add_to_set == "y" and len(recommended_ids) > 0:
+            e621.add_posts_to_set(profile["set"]["id"], recommended_ids)
+            print("Added posts to set!")
 
+    with open(f"{user_name}_profile.json", "w") as f:
+        json.dump(profile, f, indent=4)
 
 
 

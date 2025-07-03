@@ -156,3 +156,54 @@ class e621Client():
         img = img.crop((xc - l, yc - l, xc + l, yc + l))
         img = img.resize((side, side))
         return img
+    
+
+    def add_posts_to_set(self, set_id, posts):
+        url = f"https://e621.net/post_sets/{set_id}/add_posts.json"
+        data = [('post_ids[]', str(post_id)) for post_id in posts]
+
+        try:
+            self.wait_delay()
+            response = requests.post(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers,
+                    data=data
+                )
+        except:
+            print(f"Failed to add posts - An unexpected error occurred")
+            return False
+
+        if response.status_code != 201:
+            print(f"Failed to add posts - Status: {response.status_code}")
+            return False
+        
+        return True
+
+
+    def create_set(self, set_title, set_short_name):
+        url = "https://e621.net/post_sets.json"
+        data = {
+            'post_set[name]': set_title,
+            'post_set[shortname]': set_short_name,
+            "post_set[is_public]": "false"
+        }
+        try:
+            self.wait_delay()
+            response = requests.post(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers,
+                    data=data
+                )
+        except:
+            print(f"Failed to create set - An unexpected error occurred")
+            return -1
+
+        if response.status_code != 201 and response.status_code != 422:
+            print(f"Failed to create set - Status: {response.status_code}")
+            return -1
+        
+        result = response.json()
+        return result["id"]
+        

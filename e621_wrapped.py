@@ -134,7 +134,7 @@ if __name__ == "__main__":
         description="Generates a review of your favorite tags!"
     )
     parser.add_argument("-u", "--user", required=True, help="The user_id to make the Wrapped for")
-    parser.add_argument("-p", "--pages", default=10, help="The max amount of pages to look for favorites in. Each page contains 320 users (at least 1 second per page)")
+    parser.add_argument("-p", "--pages", default=100, help="The max amount of pages to look for favorites in. Each page contains 320 users (at least 1 second per page)")
     args = parser.parse_args()
 
     with open(INTERESTS_FILE, "r") as f:
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     # Get favorites
     favs = []
     fav_dict = {}
-    for i in tqdm(range(int(args.pages)), "Getting favorites", unit=" pages", total=int(args.pages)):
+    for i in tqdm(range(int(args.pages)), f"Getting favorites most recent favorites (up to {int(args.pages) * 320})", unit=" pages", total=int(args.pages)):
         new_favs = e621.get_favorites(args.user, i)
         for fav in new_favs:
             favs.append(fav)
@@ -460,6 +460,4 @@ if __name__ == "__main__":
     print(f"\n- Saved your detailed report as {user_name}_detailed.png :3")
     print(f"\n- So you're into {favorite_tags[0].split(':')[1].replace('_', ' ')}, huh... ;3\n")
 
-        
-
-
+    

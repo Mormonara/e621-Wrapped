@@ -26,6 +26,10 @@ If you'd like to access your own private favorite information, you can optionall
 }
 ```
 
+## 👀 Recommendation engine
+
+After running `e621_wrapped.py`, the program will generate a profile that will be store as `username_profile.json`. With this, you can run `recommend.bat` on Windows or `recommend.sh` on Linux to search through a selection of tags and extract non-favorited posts that match with your profile. If you have authentication set up, you also have the option to have the program automatically create a private set in your profile and add the recommended posts to it, so you can more easily sort through them
+
 ## ❓ How it works
 
 e621 Wrapped uses public favorite information to create a user profile and compares it to the average user
