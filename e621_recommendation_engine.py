@@ -53,7 +53,8 @@ if __name__ == "__main__":
     ###################
     recommended_posts = profile["fav_dict"]
     if args.add_to_set == "y":
-        recommended_posts.update(profile["set"]["posts"])
+        for post_id in profile["set"]["posts"]:
+            recommended_posts[post_id] = True
     max_score = 0
 
     for i in range(int(args.pages)):
