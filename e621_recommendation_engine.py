@@ -78,8 +78,11 @@ if __name__ == "__main__":
             e621.add_posts_to_set(profile["set"]["id"], recommended_ids)
             print("Added posts to set!")
 
-    with open(f"{user_name}_profile.json", "w") as f:
-        json.dump(profile, f, indent=4)
+    if args.add_to_set == "y":
+        profile["set"]["posts"] = recommended_ids
+        with open(f"{user_name}_profile.json", "w") as f:
+            json.dump(profile, f, indent=4)
+
 
 
 
