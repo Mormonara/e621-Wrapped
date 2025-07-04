@@ -5,7 +5,7 @@ echo "- I'm setting things up so we can recommend some posts based on your profi
 echo
 
 # STEP 1: Check if Python is installed
-if ! command -v python &> /dev/null; then
+if ! command -v python3 &> /dev/null; then
     echo "- Couldn't find a Python installation :o"
     echo "- Please install Python from https://www.python.org/downloads/"
     echo "- Opening download page in your browser..."
@@ -18,7 +18,7 @@ if [ -d ".venv" ]; then
     echo "- Virtual environment already exists! Skipping creation and pip install."
 else
     echo "- Creating virtual environment... please wait a sec :3c"
-    python -m venv .venv
+    python3 -m venv .venv
 fi
 
 # STEP 3: Activate virtual environment
@@ -35,8 +35,8 @@ if [ -f "requirements.txt" ]; then
     if [ ! -f ".venv/installed.flag" ]; then
         echo "- Installing requirements... >:3"
         echo
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r requirements.txt
         echo done > .venv/installed.flag
     fi
 else
@@ -54,4 +54,4 @@ read -rp "- Add any extra tags to search for. The more suited to you they are, t
 read -rp "- Should we create a set in your profile to store these posts? (y/n) (This requires credentials.json. You should experiment with settings to make sure you like the generated posts before turning this on): " ADD
 
 # STEP 6: Run the Python program
-python e621_recommendation_engine.py -u "$USER_ID" -p "$PAGES" -s "$STARS" -t "$TAGS" -a "$ADD"
+python3 e621_recommendation_engine.py -u "$USER_ID" -p "$PAGES" -s "$STARS" -t "$TAGS" -a "$ADD"

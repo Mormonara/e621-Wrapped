@@ -30,8 +30,8 @@ if [ -f requirements.txt ]; then
     if [ ! -f .venv/installed.flag ]; then
         echo "- Installing requirements... >:3"
         echo
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r requirements.txt
         echo "done" > .venv/installed.flag
     fi
 else
@@ -45,6 +45,6 @@ echo
 read -p "- Enter your E621 user_id. That's the number that appears at the end of the URL to your user page: " USER_ID
 
 # STEP 6: Run the Python program
-python e621_wrapped.py -u "$USER_ID"
+python3 e621_wrapped.py -u "$USER_ID"
 
 read -p "Press enter to exit..."
