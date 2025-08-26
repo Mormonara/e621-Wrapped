@@ -15,6 +15,7 @@ TAG_IMPLICATIONS_FILE = "data/tag_implications.csv"
 
 MIN_PERCENT = 0.001
 EXCLUDE_WORDS = ["male", "anthro", "female"]
+INVALID_ARTISTS = ["sound_warning", "conditional_dnp", "censored", "unknown_artist", "anonymous_artist"]
 RELATIVE_PRESENCE_CAP = 100
 ALLOWED_FILE_TYPES = ["png", "jpg"]
 
@@ -298,7 +299,7 @@ if __name__ == "__main__":
 
         if not category == "artist":
             continue
-        if name in ["sound_warning", "conditional_dnp"]:
+        if name in INVALID_ARTISTS:
             continue
         
         favorite_artists.append(tag)
