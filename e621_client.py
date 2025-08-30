@@ -33,6 +33,27 @@ class e621Client():
         self.time_since_last_request = time.time()
 
 
+    def get_upvoted_posts(self, user_id, page_num):
+        url = f"https://e621.net/posts.json?tags=votedup:{user_id}"
+        try:
+            self.wait_delay()
+            response = requests.get(
+                    url,
+                    auth=self.auth,
+                    headers=self.headers
+                )
+        except:
+            print(f"Failed to get upvoted posts for {user_id} - An unexpected error occurred")
+            return []
+        
+        if response.status_code != 200:
+            print(f"Failed to get upvoted posts for {user_id} - Status: {response.status_code}")
+            return []
+        
+        data = response.json()
+        return data['posts']
+
+
     def get_favorites(self, user_id, page_num):
         url = f'https://e621.net/favorites.json?limit=320&user_id={user_id}&page={page_num}'
         try:

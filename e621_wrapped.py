@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, BooleanOptionalAction
 from e621_client import e621Client
 from interest_generator import get_user_interests
 from tqdm.auto import tqdm
@@ -136,12 +136,16 @@ if __name__ == "__main__":
     )
     parser.add_argument("-u", "--user", required=True, help="The user_id to make the Wrapped for")
     parser.add_argument("-p", "--pages", default=100, help="The max amount of pages to look for favorites in. Each page contains 320 users (at least 1 second per page)")
+    parser.add_argument("-v", "--upvoted", default=False, help="Pass this argument to look through your upvoted posts rather than your favorites", action=BooleanOptionalAction)
     args = parser.parse_args()
 
     with open(INTERESTS_FILE, "r") as f:
         global_interests = json.load(f)
     
     e621 = e621Client(CREDENTIALS_FILE)
+    if e621.auth is None and args.upvoted:
+        print("Upvote data is private! Please setup a credentials.json to generate a Wrapped based on your upvotes :o")
+        exit(0)
     user_data = e621.get_user(args.user)
     user_name = user_data["name"]
     print(f"- Hi {user_name}! I'm generating your e621 Wrapped, so hang tight :3\n")
@@ -153,7 +157,7 @@ if __name__ == "__main__":
     favs = []
     fav_dict = {}
     for i in tqdm(range(int(args.pages)), f"Getting favorites most recent favorites (up to {int(args.pages) * 320})", unit=" pages", total=int(args.pages)):
-        new_favs = e621.get_favorites(args.user, i)
+        new_favs = e621.get_favorites(args.user, i) if not args.upvoted else e621.get_upvoted_posts(args.user, i)
         for fav in new_favs:
             favs.append(fav)
             fav_dict[fav["id"]] = True
