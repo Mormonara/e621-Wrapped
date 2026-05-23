@@ -387,8 +387,9 @@ if __name__ == "__main__":
         pass
 
     try:
-        user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
-        wrapped.paste(user_pfp, (30, 13))
+        if user_data["avatar_id"] != None:
+            user_pfp = e621.get_post_thumb(user_data["avatar_id"], 300)
+            wrapped.paste(user_pfp, (30, 13))
     except:
         pass
 
@@ -414,7 +415,7 @@ if __name__ == "__main__":
     if len(user_name) > 11:
         fontsize = 24
     if len(user_name) > 18:
-        fontsize=12
+        fontsize = 12
 
     font = ImageFont.truetype("fonts/liberation-fonts-ttf-2.1.5/LiberationSans-BoldItalic.ttf", size=fontsize)
 
