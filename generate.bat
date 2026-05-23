@@ -52,7 +52,17 @@ echo ###
 echo.
 set /p USER_ID=- Enter your E621 user_id. That's the number that appears at the end of the URL to your user page: 
 
-:: STEP 6: Run the Python program
-python e621_wrapped.py -u %USER_ID%
+:: STEP 6: Ask user whether looking through upvoted posts or favorites
+echo.
+echo ### 
+echo.
+set /p MOD_V=- Would you like to look through your upvoted posts rather than your favorites? (Y/N): 
+
+:: STEP 7: Run the Python program
+if /i "%MOD_V%"=="Y" (
+    python e621_wrapped.py -u %USER_ID% --no-fav -v
+) else (
+    python e621_wrapped.py -u %USER_ID%
+)
 
 pause

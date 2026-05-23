@@ -15,7 +15,7 @@ TAG_IMPLICATIONS_FILE = "data/tag_implications.csv"
 
 MIN_PERCENT = 0.001
 EXCLUDE_WORDS = ["male", "anthro", "female"]
-INVALID_ARTISTS = ["sound_warning", "conditional_dnp", "censored", "unknown_artist", "anonymous_artist"]
+INVALID_ARTISTS = ["sound_warning", "conditional_dnp", "censored", "unknown_artist", "anonymous_artist", "avoid_posting"]
 RELATIVE_PRESENCE_CAP = 100
 ALLOWED_FILE_TYPES = ["png", "jpg"]
 
@@ -136,7 +136,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("-u", "--user", required=True, help="The user_id to make the Wrapped for")
     parser.add_argument("-p", "--pages", default=100, help="The max amount of pages to look for favorites in. Each page contains 320 users (at least 1 second per page)")
-    parser.add_argument("-v", "--upvoted", default=False, help="Pass this argument to look through your upvoted posts rather than your favorites", action=BooleanOptionalAction)
+    parser.add_argument("-f", "--fav", default=True, help="Pass this argument to look through your favorites. Otherwise does NOT exclude favorites", action=BooleanOptionalAction)
+    parser.add_argument("-v", "--upvoted", default=False, help="Pass this argument to look through your upvoted posts. Otherwise does NOT exclude upvoted posts", action=BooleanOptionalAction)
+    parser.add_argument("-s", "--post_set", default="", help="The short name (or id) of your (or public) set to look through posts in. Leave it blank to ignore")
     args = parser.parse_args()
 
     with open(INTERESTS_FILE, "r") as f:
@@ -146,6 +148,9 @@ if __name__ == "__main__":
     if e621.auth is None and args.upvoted:
         print("Upvote data is private! Please setup a credentials.json to generate a Wrapped based on your upvotes :o")
         exit(0)
+    if e621.auth is None and args.post_set:
+        # How to tell apart public sets from private ones?
+        pass
     user_data = e621.get_user(args.user)
     user_name = user_data["name"]
     print(f"- Hi {user_name}! I'm generating your e621 Wrapped, so hang tight :3\n")
@@ -157,7 +162,13 @@ if __name__ == "__main__":
     favs = []
     fav_dict = {}
     for i in tqdm(range(int(args.pages)), f"Getting favorites most recent favorites (up to {int(args.pages) * 320})", unit=" pages", total=int(args.pages)):
-        new_favs = e621.get_favorites(args.user, i) if not args.upvoted else e621.get_upvoted_posts(args.user, i)
+        new_favs = e621.get_posts(
+            page_num = i + 1,
+            user_id = args.user,
+            fav = args.fav,
+            upvoted = args.upvoted,
+            post_set = args.post_set
+        )
         for fav in new_favs:
             favs.append(fav)
             fav_dict[fav["id"]] = True
@@ -393,6 +404,8 @@ if __name__ == "__main__":
     ]
     for f_idx, favorite in enumerate(favorites):
         for b_idx, bb in enumerate(bounding_boxes[f_idx]):
+            if b_idx >= len(favorite):
+                break
             draw_favorite(favorite[b_idx], user_profile, bb, wrapped, b_idx == 0)
 
     draw = ImageDraw.Draw(wrapped)
