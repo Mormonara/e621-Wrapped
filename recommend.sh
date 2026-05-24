@@ -50,8 +50,9 @@ echo
 read -rp "- Enter your E621 user_id. That's the number that appears at the end of the URL to your user page: " USER_ID
 read -rp "- Enter total number of pages to search in (try starting with 10): " PAGES
 read -rp "- Enter the minimum amount of stars for a post to be recommended (this depends on user profile. Start with 6 and adjust until you like the posts that come out): " STARS
+read -rp "- Enter the minimum upvote score for a post to be recommended: " UPVOTE
 read -rp "- Add any extra tags to search for. The more suited to you they are, the more recommended posts will be found: " TAGS
 read -rp "- Should we create a set in your profile to store these posts? (y/n) (This requires credentials.json. You should experiment with settings to make sure you like the generated posts before turning this on): " ADD
 
 # STEP 6: Run the Python program
-python3 e621_recommendation_engine.py -u "$USER_ID" -p "$PAGES" -s "$STARS" -t "$TAGS" -a "$ADD"
+python3 e621_recommendation_engine.py -u "$USER_ID" -p "$PAGES" -s "$STARS" -m "$UPVOTE" -t "$TAGS" -a "$ADD"
