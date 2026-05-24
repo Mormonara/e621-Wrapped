@@ -120,7 +120,7 @@ def get_post_score(post, user_profile, weights, favorite_tag_categories, return_
                     best_tags.append(tag.split(":")[1])
                 score += weights[i] * user_profile[tag]["enjoyment"]
 
-    final_score = score / math.pow(len(post["clean_tags"]), 0.2) * (math.pow(post["score"]["total"], 0.1) if post["score"]["total"] > 0 else 0)
+    final_score = score / math.pow(len(post["clean_tags"]), 0.2) * (math.pow(post["stats"]["score"]["total"], 0.1) if post["stats"]["score"]["total"] > 0 else 0)
     if return_best_tags:
         return final_score, best_tags
     return final_score
@@ -353,9 +353,9 @@ if __name__ == "__main__":
     post_scores = {}
     
     for fav in favs:
-        if fav["file"]["url"] is None:
+        if fav["files"]["original"]["url"] is None:
             continue
-        if not fav["file"]["url"].split(".")[-1] in ALLOWED_FILE_TYPES:
+        if not fav["files"]["original"]["url"].split(".")[-1] in ALLOWED_FILE_TYPES:
             continue
             
         post_scores[fav["id"]] = get_post_score(fav, user_profile, weights, favorite_tag_categories)
