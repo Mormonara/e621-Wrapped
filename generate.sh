@@ -44,17 +44,34 @@ echo "###"
 echo
 read -p "- Enter your E621 user_id. That's the number that appears at the end of the URL to your user page: " USER_ID
 
-# STEP 6: Ask user whether looking through upvoted posts or favorites
+# STEP 6: Ask user whether looking through favorites, upvoted posts or a set
 echo
 echo "###"
 echo
-read -p "- Would you like to look through your upvoted posts rather than your favorites? (Y/N): " MOD_V
+echo "- What kind of posts do you prefer to use to generate your e621 Wrapped:"
+echo "1. Favorites"
+echo "2. Upvoted posts"
+echo "3. A specific set"
+echo
+read -p "- Enter 1, 2, or 3: " MODE
+
+SET_NAME=""
+if [ "$MODE" = "3" ]; then
+    echo
+    echo "###"
+    echo
+    read -p "- Enter the set name or id: " SET_NAME
+fi
 
 # STEP 7: Run the Python program
-if [[ "$MOD_V" =~ ^[Yy]$ ]]; then
-    python3 e621_wrapped.py -u "$USER_ID" --no-fav -v
-else
+if [ "$MODE" = "1" ]; then
     python3 e621_wrapped.py -u "$USER_ID"
+elif [ "$MODE" = "2" ]; then
+    python3 e621_wrapped.py -u "$USER_ID" --no-fav -v
+elif [ "$MODE" = "3" ]; then
+    python3 e621_wrapped.py -u "$USER_ID" --no-fav -s "$SET_NAME"
+else
+    echo "- What? I don't know what you mean."
 fi
 
 read -p "Press enter to exit..."
