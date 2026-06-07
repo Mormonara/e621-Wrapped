@@ -6,25 +6,20 @@ from io import BytesIO
 import os
 
 
-class e621Client():
+class e621Client:
     def __init__(self, credentials_path, delay = 1):
-        if os.path.exists("credentials.json"):
-            with open(credentials_path, 'r') as f:
+        if os.path.exists(credentials_path):
+            with open(credentials_path, "r") as f:
                 credentials = json.load(f)
                 self.auth = (credentials["username"], credentials["api_key"])
-                self.headers = {
-                    "User-Agent": credentials["user_agent"]
-                }
+                self.headers = {"User-Agent": credentials["user_agent"]}
         else:
             print("- Running in unauthenticated mode :o to access private favorite data, please provide a credentials.json as specified in the README")
             self.auth = None
-            self.headers = {
-                    "User-Agent": "e621Wrapped/1.0 (by mormonara on e621)"
-            }
-        
+            self.headers = {"User-Agent": "e621Wrapped/1.0 (by mormonara on e621)"}
+
         self.delay = delay
         self.time_since_last_request = 0.0
-    
 
     def wait_delay(self):
         new_time = time.time()
@@ -32,140 +27,155 @@ class e621Client():
             time.sleep(self.delay - new_time + self.time_since_last_request)
         self.time_since_last_request = time.time()
 
+    def get_posts(
+        self,
+        page_num: int = 1,
+        user_id: int = 0,
+        fav: bool = False,
+        upvoted: bool = False,
+        post_set: str = "",
+        extra_tags: str = "",
+    ):
+        url = f"https://e621.net/posts.json?v2=true&mode=extended&limit=320&page={page_num}"
+        url += "&tags=" if fav or upvoted or post_set or extra_tags else ""
+        url += f"fav:!{user_id}+" if fav else ""
+        url += f"votedup:!{user_id}+" if upvoted else ""
+        url += f"set:{post_set}+" if post_set else ""
+        url += f"( {extra_tags} )" if extra_tags else ""
 
-    def get_upvoted_posts(self, user_id, page_num):
-        url = f"https://e621.net/posts.json?tags=votedup:{user_id}"
         try:
             self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
-        except:
-            print(f"Failed to get upvoted posts for {user_id} - An unexpected error occurred")
-            return []
-        
-        if response.status_code != 200:
-            print(f"Failed to get upvoted posts for {user_id} - Status: {response.status_code}")
-            return []
-        
-        data = response.json()
-        return data['posts']
-
-
-    def get_favorites(self, user_id, page_num):
-        url = f'https://e621.net/favorites.json?limit=320&user_id={user_id}&page={page_num}'
-        try:
-            self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
-        except:
-            print(f"Failed to get favorites for {user_id} - An unexpected error occurred")
-            return []
-        
-        if response.status_code != 200:
-            print(f"Failed to get favorites for {user_id} - Status: {response.status_code}")
-            return []
-        
-        data = response.json()
-        return data['posts']
-
-
-    def get_random_posts(self, min_upvotes, extra_tags):
-        url = f"https://e621.net/posts.json?tags=order:random+score:>={min_upvotes}{'+' + extra_tags if len(extra_tags) > 0 else ''}"
-        try:
-            self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
+            response = requests.get(url, auth = self.auth, headers = self.headers)
         except:
             print(f"Failed to get posts - An unexpected error occurred")
             return []
-        
+
         if response.status_code != 200:
             print(f"Failed to get posts - Status: {response.status_code}")
             return []
-        
-        data = response.json()
-        return data['posts']
-    
+
+        return response.json()
+
+    def get_posts_from_set(self, post_set, page_num):
+        url = f"https://e621.net/posts.json?v2=true&mode=extended&limit=320&tags=set:{post_set}&page={page_num}"
+
+        try:
+            self.wait_delay()
+            response = requests.get(url, auth = self.auth, headers = self.headers)
+        except:
+            print(f"Failed to get posts in set:{post_set} - An unexpected error occurred")
+            return []
+
+        if response.status_code != 200:
+            print(f"Failed to get posts in set:{post_set} - Status: {response.status_code}")
+            return []
+
+        return response.json()
+
+    def get_upvoted_posts(self, user_id, page_num):
+        url = f"https://e621.net/posts.json?v2=true&mode=extended&limit=320&tags=votedup:{user_id}&page={page_num}"
+
+        try:
+            self.wait_delay()
+            response = requests.get(url, auth = self.auth, headers = self.headers)
+        except:
+            print(f"Failed to get upvoted posts for {user_id} - An unexpected error occurred")
+            return []
+
+        if response.status_code != 200:
+            print(f"Failed to get upvoted posts for {user_id} - Status: {response.status_code}")
+            return []
+
+        return response.json()
+
+    def get_favorites(self, user_id, page_num):
+        url = f"https://e621.net/favorites.json?v2=true&mode=extended&limit=320&user_id={user_id}&page={page_num}"
+
+        try:
+            self.wait_delay()
+            response = requests.get(url, auth = self.auth, headers = self.headers)
+        except:
+            print(f"Failed to get favorites for {user_id} - An unexpected error occurred")
+            return []
+
+        if response.status_code != 200:
+            print(f"Failed to get favorites for {user_id} - Status: {response.status_code}")
+            return []
+
+        return response.json()
+
+    def get_random_posts(self, min_upvotes, extra_tags):
+        url = f"https://e621.net/posts.json?v2=true&mode=extended&tags=order:random+score:>={min_upvotes}{'+' + extra_tags if len(extra_tags) > 0 else ''}"
+
+        try:
+            self.wait_delay()
+            response = requests.get(url, auth = self.auth, headers = self.headers)
+        except:
+            print(f"Failed to get posts - An unexpected error occurred")
+            return []
+
+        if response.status_code != 200:
+            print(f"Failed to get posts - Status: {response.status_code}")
+            return []
+
+        return response.json()
 
     def get_top_users(self, page_num):
         url = f"https://e621.net/users.json?limit=320&page={page_num}&search[order]=post_upload_count"
+
         try:
             self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
+            response = requests.get(url, auth = self.auth, headers = self.headers)
         except:
             print(f"Failed to get users - An unexpected error occurred")
-            return[]
-        
+            return []
+
         if response.status_code != 200:
             print(f"Failed to get users - Status: {response.status_code}")
             return []
-        
+
         return response.json()
-    
 
     def get_user(self, user_id):
         url = f"https://e621.net/users/{user_id}.json"
+
         try:
             self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
+            response = requests.get(url, auth = self.auth, headers = self.headers)
         except:
             print(f"Failed to get post - An unexpected error occurred")
-            return[]
-        
+            return []
+
         if response.status_code != 200:
             print(f"Failed to get post - Status: {response.status_code}")
             return []
-        
+
         return response.json()
 
-
     def get_post_thumb(self, post_id, side):
-        url = f"https://e621.net/posts/{post_id}.json"
+        url = f"https://e621.net/posts/{post_id}.json?v2=true&mode=thumbnails"
+
         try:
             self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
+            response = requests.get(url, auth = self.auth, headers = self.headers)
         except:
             print(f"Failed to get post - An unexpected error occurred")
-            return[]
-        
+            return []
+
         if response.status_code != 200:
             print(f"Failed to get post - Status: {response.status_code}")
             return []
-        
+
         data = response.json()
-        url = data["post"]["file"]["url"]
+        url = data["sample_url"]
+
         try:
             self.wait_delay()
-            response = requests.get(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers
-                )
+            response = requests.get(url, auth = self.auth, headers = self.headers)
         except:
             print(f"Failed to get post - An unexpected error occurred")
-            return[]
-        
+            return []
+
         if response.status_code != 200:
             print(f"Failed to get post - Status: {response.status_code}")
             return []
@@ -177,20 +187,14 @@ class e621Client():
         img = img.crop((xc - l, yc - l, xc + l, yc + l))
         img = img.resize((side, side))
         return img
-    
 
     def add_posts_to_set(self, set_id, posts):
         url = f"https://e621.net/post_sets/{set_id}/add_posts.json"
-        data = [('post_ids[]', str(post_id)) for post_id in posts]
+        data = [("post_ids[]", str(post_id)) for post_id in posts]
 
         try:
             self.wait_delay()
-            response = requests.post(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers,
-                    data=data
-                )
+            response = requests.post(url, auth = self.auth, headers = self.headers, data = data)
         except:
             print(f"Failed to add posts - An unexpected error occurred")
             return False
@@ -198,25 +202,20 @@ class e621Client():
         if response.status_code != 201:
             print(f"Failed to add posts - Status: {response.status_code}")
             return False
-        
-        return True
 
+        return True
 
     def create_set(self, set_title, set_short_name):
         url = "https://e621.net/post_sets.json"
         data = {
-            'post_set[name]': set_title,
-            'post_set[shortname]': set_short_name,
+            "post_set[name]": set_title,
+            "post_set[shortname]": set_short_name,
             "post_set[is_public]": "false"
         }
+
         try:
             self.wait_delay()
-            response = requests.post(
-                    url,
-                    auth=self.auth,
-                    headers=self.headers,
-                    data=data
-                )
+            response = requests.post(url, auth = self.auth, headers = self.headers, data = data)
         except:
             print(f"Failed to create set - An unexpected error occurred")
             return -1
@@ -224,7 +223,6 @@ class e621Client():
         if response.status_code != 201 and response.status_code != 422:
             print(f"Failed to create set - Status: {response.status_code}")
             return -1
-        
+
         result = response.json()
         return result["id"]
-        

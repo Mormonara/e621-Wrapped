@@ -5,6 +5,9 @@ from tqdm.auto import tqdm
 
 
 def get_user_interests(favs):
+    """
+    This function expects extended tag categories/legacy structure
+    """
     user_interests = {}
     for fav in favs:
         for topic in fav["tags"]:
@@ -13,10 +16,10 @@ def get_user_interests(favs):
                 if not tag_name in user_interests:
                     user_interests[tag_name] = 0
                 user_interests[tag_name] += 1
-    
+
     for tag in user_interests:
         user_interests[tag] /= len(favs)
-    
+
     return user_interests
 
 
@@ -34,35 +37,37 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     e621 = e621Client(CREDENTIALS_FILE)
-    
+
     interests = {}
 
     total_users = 0
     for i in range(int(args.pages)):
-        users = e621.get_top_users(i)
+        users = e621.get_top_users(i + 1)
         for user in tqdm(users, f" Analyzing page {i + 1} of users", unit=" users", total=len(users)):
-            favs = e621.get_favorites(user["id"], 0)
+            favs = []
+            page_num = 0
+
+            while True:
+                page_num += 1
+                new_favs = e621.get_favorites(user["id"], page_num)
+                favs.extend(new_favs)
+                if len(new_favs) < 320:
+                    break
 
             if len(favs) < MIN_FAVORITES:
                 continue
 
             user_interests = get_user_interests(favs)
-            
+
             for tag in user_interests:
                 if not tag in interests:
                     interests[tag] = 0.0
-            
-            for tag in interests:
-                user_interest_in_tag = user_interests[tag] if tag in user_interests else 0.0
-                interests[tag] = (interests[tag] * total_users + user_interest_in_tag) / (total_users + 1)
+                interests[tag] += user_interests[tag]
 
             total_users += 1
-    
-    with open(INTERESTS_FILE, 'w') as f:
+
+    for tag in interests:
+        interests[tag] /= total_users
+
+    with open(INTERESTS_FILE, "w") as f:
         json.dump(interests, f, indent=4)
-
-
-
-
-
-
